@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../models/weather_model.dart';
-import 'weather_info_tile.dart';
 import 'forecast_card.dart';
 import 'hourly_forecast_card.dart';
 
@@ -57,98 +56,105 @@ class WeatherView extends StatelessWidget {
               children: [
                 // Current Weather Card
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(32),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                    child: Container(
-                      padding: const EdgeInsets.all(32),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withValues(alpha: 0.2),
-                            Colors.white.withValues(alpha: 0.05),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(32),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 30,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            '${currentLocation.name}${currentLocation.country.isNotEmpty ? ', ${currentLocation.country}' : ''}',
-                            style: GoogleFonts.outfit(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF38BDF8).withValues(alpha: 0.2),
-                                  blurRadius: 40,
-                                  spreadRadius: 10,
-                                ),
+                      borderRadius: BorderRadius.circular(32),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                        child: Container(
+                          padding: const EdgeInsets.all(32),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white.withValues(alpha: 0.2),
+                                Colors.white.withValues(alpha: 0.05),
                               ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                            child: Text(
-                              emoji,
-                              style: const TextStyle(fontSize: 80),
+                            borderRadius: BorderRadius.circular(32),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.3),
+                              width: 1.5,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 30,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            _formatTemp(current.temperature),
-                            style: GoogleFonts.outfit(
-                              fontSize: 84,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              height: 1.0,
-                              shadows: [
-                                Shadow(
-                                  color: const Color(0xFF38BDF8).withValues(alpha: 0.5),
-                                  blurRadius: 30,
-                                  offset: const Offset(0, 5),
+                          child: Column(
+                            children: [
+                              Text(
+                                '${currentLocation.name}${currentLocation.country.isNotEmpty ? ', ${currentLocation.country}' : ''}',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
                                 ),
-                              ],
-                            ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 24),
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFF38BDF8,
+                                      ).withValues(alpha: 0.2),
+                                      blurRadius: 40,
+                                      spreadRadius: 10,
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  emoji,
+                                  style: const TextStyle(fontSize: 80),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                _formatTemp(current.temperature),
+                                style: GoogleFonts.outfit(
+                                  fontSize: 84,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  height: 1.0,
+                                  shadows: [
+                                    Shadow(
+                                      color: const Color(
+                                        0xFF38BDF8,
+                                      ).withValues(alpha: 0.5),
+                                      blurRadius: 30,
+                                      offset: const Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                label,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF38BDF8),
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            label,
-                            style: GoogleFonts.outfit(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF38BDF8),
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                ).animate().fade(duration: 600.ms).slideY(begin: 0.2, curve: Curves.easeOutQuad),
-                
+                    )
+                    .animate()
+                    .fade(duration: 600.ms)
+                    .slideY(begin: 0.2, curve: Curves.easeOutQuad),
+
                 const SizedBox(height: 32),
-                
+
                 // Hourly Forecast
                 if (upcomingHourly.isNotEmpty) ...[
                   Text(
@@ -169,9 +175,15 @@ class WeatherView extends StatelessWidget {
                       itemCount: upcomingHourly.length,
                       itemBuilder: (context, index) {
                         return HourlyForecastCard(
-                          forecast: upcomingHourly[index],
-                          isCelsius: isCelsius,
-                        ).animate().fade(delay: (200 + index * 50).ms, duration: 400.ms).slideX(begin: 0.2, curve: Curves.easeOutQuad);
+                              forecast: upcomingHourly[index],
+                              isCelsius: isCelsius,
+                            )
+                            .animate()
+                            .fade(
+                              delay: (200 + index * 50).ms,
+                              duration: 400.ms,
+                            )
+                            .slideX(begin: 0.2, curve: Curves.easeOutQuad);
                       },
                     ),
                   ),
@@ -189,28 +201,66 @@ class WeatherView extends StatelessWidget {
                   ),
                 ).animate().fade(delay: 200.ms, duration: 600.ms),
                 const SizedBox(height: 16),
-                
+
                 GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 1.5,
-                  children: [
-                    _buildDetailBox(Icons.thermostat, 'Feels Like', _formatTemp(current.apparentTemperature)),
-                    _buildDetailBox(Icons.water_drop_outlined, 'Humidity', '${current.humidity}%'),
-                    _buildDetailBox(Icons.air, 'Wind', '${current.windSpeed} km/h'),
-                    _buildDetailBox(Icons.visibility, 'Visibility', '${(current.visibility / 1000).toStringAsFixed(1)} km'),
-                    if (daily != null) _buildDetailBox(Icons.wb_sunny, 'UV Index', daily.uvIndexMax.toStringAsFixed(1)),
-                    _buildDetailBox(Icons.speed, 'Pressure', '${current.surfacePressure.round()} hPa'),
-                    if (daily != null) _buildDetailBox(Icons.wb_twilight, 'Sunrise', daily.sunrise.split('T').last),
-                    if (daily != null) _buildDetailBox(Icons.nights_stay, 'Sunset', daily.sunset.split('T').last),
-                  ],
-                ).animate().fade(delay: 300.ms, duration: 600.ms).slideY(begin: 0.1),
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 1.5,
+                      children: [
+                        _buildDetailBox(
+                          Icons.thermostat,
+                          'Feels Like',
+                          _formatTemp(current.apparentTemperature),
+                        ),
+                        _buildDetailBox(
+                          Icons.water_drop_outlined,
+                          'Humidity',
+                          '${current.humidity}%',
+                        ),
+                        _buildDetailBox(
+                          Icons.air,
+                          'Wind',
+                          '${current.windSpeed} km/h',
+                        ),
+                        _buildDetailBox(
+                          Icons.visibility,
+                          'Visibility',
+                          '${(current.visibility / 1000).toStringAsFixed(1)} km',
+                        ),
+                        if (daily != null)
+                          _buildDetailBox(
+                            Icons.wb_sunny,
+                            'UV Index',
+                            daily.uvIndexMax.toStringAsFixed(1),
+                          ),
+                        _buildDetailBox(
+                          Icons.speed,
+                          'Pressure',
+                          '${current.surfacePressure.round()} hPa',
+                        ),
+                        if (daily != null)
+                          _buildDetailBox(
+                            Icons.wb_twilight,
+                            'Sunrise',
+                            daily.sunrise.split('T').last,
+                          ),
+                        if (daily != null)
+                          _buildDetailBox(
+                            Icons.nights_stay,
+                            'Sunset',
+                            daily.sunset.split('T').last,
+                          ),
+                      ],
+                    )
+                    .animate()
+                    .fade(delay: 300.ms, duration: 600.ms)
+                    .slideY(begin: 0.1),
 
                 const SizedBox(height: 32),
-                
+
                 // 7-Day Forecast
                 Text(
                   '7-DAY FORECAST',
@@ -230,9 +280,12 @@ class WeatherView extends StatelessWidget {
                     itemCount: weatherData.daily.length,
                     itemBuilder: (context, index) {
                       return ForecastCard(
-                        forecast: weatherData.daily[index],
-                        isCelsius: isCelsius,
-                      ).animate().fade(delay: (400 + index * 100).ms, duration: 500.ms).slideX(begin: 0.2, curve: Curves.easeOutQuad);
+                            forecast: weatherData.daily[index],
+                            isCelsius: isCelsius,
+                          )
+                          .animate()
+                          .fade(delay: (400 + index * 100).ms, duration: 500.ms)
+                          .slideX(begin: 0.2, curve: Curves.easeOutQuad);
                     },
                   ),
                 ),
