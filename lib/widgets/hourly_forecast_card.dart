@@ -1,17 +1,17 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/weather_model.dart';
 import 'package:intl/intl.dart';
 
 class HourlyForecastCard extends StatelessWidget {
   final HourlyForecast forecast;
   final bool isCelsius;
+  final bool isNow;
 
   const HourlyForecastCard({
     super.key,
     required this.forecast,
     required this.isCelsius,
+    this.isNow = false,
   });
 
   String _formatTemp(double temp) {
@@ -23,43 +23,38 @@ class HourlyForecastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emoji = WeatherUtils.getWeatherEmoji(forecast.weatherCode);
-    final timeStr = DateFormat.j().format(forecast.date); // e.g. 5 PM
+    final icon = WeatherUtils.getWeatherIcon(forecast.weatherCode);
+    final iconColor = WeatherUtils.getWeatherIconColor(forecast.weatherCode);
+    final timeStr = isNow ? 'Now' : DateFormat.j().format(forecast.date);
 
-    return Container(
-      width: 80,
-      margin: const EdgeInsets.only(right: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
+    return SizedBox(
+      width: 60,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             timeStr,
-            style: GoogleFonts.outfit(
-              color: Colors.white70,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: 15,
+              fontWeight: isNow ? FontWeight.w600 : FontWeight.w500,
+              letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            emoji,
-            style: const TextStyle(fontSize: 28),
+          const SizedBox(height: 14),
+          Icon(
+            icon,
+            color: iconColor,
+            size: 26,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Text(
             _formatTemp(forecast.temperature),
-            style: GoogleFonts.outfit(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.95),
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.3,
             ),
           ),
         ],

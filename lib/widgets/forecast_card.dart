@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/weather_model.dart';
 
 class ForecastCard extends StatelessWidget {
   final DailyForecast forecast;
   final bool isCelsius;
+  final double weeklyMin;
+  final double weeklyMax;
+  final bool isToday;
 
   const ForecastCard({
     super.key,
     required this.forecast,
     required this.isCelsius,
+    required this.weeklyMin,
+    required this.weeklyMax,
+    this.isToday = false,
   });
 
   String _formatTemp(double temp) {
@@ -19,106 +24,152 @@ class ForecastCard extends StatelessWidget {
     return '${temp.round()}°';
   }
 
-  String _getDayName(int weekday) {
+  String _getDayName(DateTime date) {
+    if (isToday) return 'Today';
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return days[weekday - 1];
+    return days[date.weekday - 1];
   }
 
   @override
   Widget build(BuildContext context) {
-    final dayName = _getDayName(forecast.date.weekday);
-    final emoji = WeatherUtils.getWeatherEmoji(forecast.weatherCode);
+    final dayName = _getDayName(forecast.date);
+    final icon = WeatherUtils.getWeatherIcon(forecast.weatherCode);
+    final iconColor = WeatherUtils.getWeatherIconColor(forecast.weatherCode);
 
-    return Container(
-      width: 100,
-      margin: const EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withValues(alpha: 0.15),
-            Colors.white.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            dayName,
-            style: GoogleFonts.outfit(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.1),
-            ),
-            child: Text(emoji, style: const TextStyle(fontSize: 32)),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                _formatTemp(forecast.maxTemp),
-                style: GoogleFonts.outfit(
+    // Calculate positions for the temperature range bar
+    final totalRange = weeklyMax - weeklyMin;
+    final double startFraction =
+        totalRange > 0 ? (forecast.minTemp - weeklyMin) / totalRange : 0.0;
+    final double endFraction =
+        totalRange > 0 ? (forecast.maxTemp - weeklyMin) / totalRange : 1.0;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: SizedBox(
+        height: 44,
+        child: Row(
+          children: [
+            // Day name
+            SizedBox(
+              width: 46,
+              child: Text(
+                dayName,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.95),
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  fontWeight: isToday ? FontWeight.w600 : FontWeight.w500,
+                  letterSpacing: -0.3,
                 ),
               ),
-              const SizedBox(width: 4),
-              Text(
+            ),
+            // Weather icon
+            SizedBox(
+              width: 40,
+              child: Center(
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: 22,
+                ),
+              ),
+            ),
+            // Low temp
+            SizedBox(
+              width: 38,
+              child: Text(
                 _formatTemp(forecast.minTemp),
-                style: GoogleFonts.outfit(
-                  fontSize: 14,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  fontSize: 18,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white54,
+                  letterSpacing: -0.3,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF38BDF8).withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.water_drop,
-                  color: Color(0xFF38BDF8),
-                  size: 12,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${forecast.precipitation.toStringAsFixed(1)}mm',
-                  style: GoogleFonts.outfit(
-                    fontSize: 12,
-                    color: const Color(0xFF38BDF8),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+            const SizedBox(width: 10),
+            // Temperature range bar
+            Expanded(
+              child: _buildTempRangeBar(startFraction, endFraction),
             ),
-          ),
-        ],
+            const SizedBox(width: 10),
+            // High temp
+            SizedBox(
+              width: 38,
+              child: Text(
+                _formatTemp(forecast.maxTemp),
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.95),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildTempRangeBar(double startFraction, double endFraction) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final totalWidth = constraints.maxWidth;
+        final barStart = startFraction * totalWidth;
+        final barEnd = endFraction * totalWidth;
+        final barWidth = (barEnd - barStart).clamp(6.0, totalWidth);
+
+        // Gradient colors based on temperature range
+        final Color startColor = _getTempColor(forecast.minTemp);
+        final Color endColor = _getTempColor(forecast.maxTemp);
+
+        return Stack(
+          children: [
+            // Track background
+            Container(
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            // Active range
+            Positioned(
+              left: barStart,
+              top: 0,
+              child: Container(
+                width: barWidth,
+                height: 5,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [startColor, endColor],
+                  ),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Color _getTempColor(double temp) {
+    // iOS-style temperature colors
+    if (!isCelsius) {
+      temp = (temp - 32) * 5 / 9; // Convert to Celsius for color logic
+    }
+    if (temp <= -10) return const Color(0xFF6366F1); // Deep indigo
+    if (temp <= 0) return const Color(0xFF38BDF8);   // Cyan-blue
+    if (temp <= 5) return const Color(0xFF22D3EE);   // Teal
+    if (temp <= 10) return const Color(0xFF2DD4BF);  // Teal-green
+    if (temp <= 15) return const Color(0xFF4ADE80);  // Green
+    if (temp <= 20) return const Color(0xFFA3E635);  // Lime
+    if (temp <= 25) return const Color(0xFFFBBF24);  // Yellow
+    if (temp <= 30) return const Color(0xFFF97316);  // Orange
+    if (temp <= 35) return const Color(0xFFEF4444);  // Red
+    return const Color(0xFFDC2626);                   // Deep red
   }
 }

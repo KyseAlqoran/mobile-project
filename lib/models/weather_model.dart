@@ -1,3 +1,6 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 class Location {
   final String name;
   final String country;
@@ -212,7 +215,7 @@ class WeatherData {
 
 class WeatherUtils {
   static String getWeatherLabel(int code) {
-    if (code == 0) return 'Clear Sky';
+    if (code == 0) return 'Clear';
     if (code == 1) return 'Mainly Clear';
     if (code == 2) return 'Partly Cloudy';
     if (code == 3) return 'Overcast';
@@ -240,5 +243,60 @@ class WeatherUtils {
     if (code >= 85 && code <= 86) return '🌨';
     if (code == 95 || code == 99) return '⛈';
     return '🌡';
+  }
+
+  /// Returns a Cupertino/Material icon matching the iOS Weather app style.
+  static IconData getWeatherIcon(int code, {bool isDay = true}) {
+    if (code == 0) {
+      return isDay ? CupertinoIcons.sun_max_fill : CupertinoIcons.moon_stars_fill;
+    }
+    if (code == 1) {
+      return isDay ? CupertinoIcons.sun_min_fill : CupertinoIcons.moon_fill;
+    }
+    if (code == 2) {
+      return isDay ? CupertinoIcons.cloud_sun_fill : CupertinoIcons.cloud_moon_fill;
+    }
+    if (code == 3) return CupertinoIcons.cloud_fill;
+    if (code >= 45 && code <= 48) return CupertinoIcons.cloud_fog_fill;
+    if (code >= 51 && code <= 55) return CupertinoIcons.cloud_drizzle_fill;
+    if (code >= 61 && code <= 65) return CupertinoIcons.cloud_rain_fill;
+    if (code >= 71 && code <= 75) return CupertinoIcons.cloud_snow_fill;
+    if (code >= 80 && code <= 82) return CupertinoIcons.cloud_heavyrain_fill;
+    if (code >= 85 && code <= 86) return CupertinoIcons.cloud_snow_fill;
+    if (code == 95 || code == 99) return CupertinoIcons.cloud_bolt_rain_fill;
+    return CupertinoIcons.thermometer;
+  }
+
+  /// Returns the iOS-style weather icon color.
+  static Color getWeatherIconColor(int code, {bool isDay = true}) {
+    if (code == 0) return isDay ? const Color(0xFFFBBF24) : const Color(0xFFFCD34D);
+    if (code == 1) return isDay ? const Color(0xFFFBBF24) : const Color(0xFFE2E8F0);
+    if (code == 2) return const Color(0xFFE2E8F0);
+    if (code == 3) return const Color(0xFFCBD5E1);
+    if (code >= 45 && code <= 48) return const Color(0xFF94A3B8);
+    if (code >= 51 && code <= 55) return const Color(0xFF93C5FD);
+    if (code >= 61 && code <= 65) return const Color(0xFF60A5FA);
+    if (code >= 71 && code <= 75) return const Color(0xFFE2E8F0);
+    if (code >= 80 && code <= 82) return const Color(0xFF60A5FA);
+    if (code >= 85 && code <= 86) return const Color(0xFFE2E8F0);
+    if (code == 95 || code == 99) return const Color(0xFFFBBF24);
+    return Colors.white;
+  }
+
+  /// Returns a short description sentence for the hourly section header.
+  static String getWeatherDescription(int code, String label) {
+    if (code == 0) return 'Clear conditions throughout the day.';
+    if (code == 1) return 'Mainly clear skies expected.';
+    if (code == 2) return 'Partly cloudy conditions expected.';
+    if (code == 3) return 'Overcast skies throughout the day.';
+    if (code >= 45 && code <= 48) return 'Fog is expected to develop.';
+    if (code >= 51 && code <= 55) return 'Light drizzle expected throughout the day.';
+    if (code >= 61 && code <= 65) return 'Rain expected. Consider bringing an umbrella.';
+    if (code >= 71 && code <= 75) return 'Snowfall expected throughout the day.';
+    if (code >= 80 && code <= 82) return 'Rain showers expected intermittently.';
+    if (code >= 85 && code <= 86) return 'Snow showers expected intermittently.';
+    if (code == 95) return 'Thunderstorms are expected.';
+    if (code == 99) return 'Severe thunderstorms expected. Stay safe.';
+    return '$label conditions expected.';
   }
 }

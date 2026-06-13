@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import '../models/weather_model.dart';
@@ -135,7 +135,10 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF38BDF8)),
+        child: CupertinoActivityIndicator(
+          color: Colors.white,
+          radius: 14,
+        ),
       );
     }
 
@@ -146,44 +149,53 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.location_off, size: 64, color: Colors.white54),
-              const SizedBox(height: 16),
+              Icon(
+                CupertinoIcons.location_slash,
+                size: 56,
+                color: Colors.white.withValues(alpha: 0.4),
+              ),
+              const SizedBox(height: 20),
               Text(
-                'Unable to get location',
-                style: GoogleFonts.outfit(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                'Unable to Get Location',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white.withValues(alpha: 0.9),
+                  letterSpacing: -0.3,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 _errorMessage!,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.outfit(fontSize: 16, color: Colors.white70),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _fetchLocationAndWeather,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF38BDF8),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 12,
-                  ),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.white.withValues(alpha: 0.55),
+                  fontWeight: FontWeight.w400,
+                  height: 1.4,
                 ),
+              ),
+              const SizedBox(height: 28),
+              CupertinoButton(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 10,
+                ),
+                onPressed: _fetchLocationAndWeather,
                 child: Text(
-                  'Retry',
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                  'Try Again',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
           ),
-        ).animate().fade(duration: 500.ms),
+        ).animate().fade(duration: 400.ms),
       );
     }
 

@@ -1,6 +1,6 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/weather_model.dart';
 import '../services/weather_service.dart';
 import '../services/storage_service.dart';
@@ -11,7 +11,8 @@ class SearchScreen extends StatefulWidget {
   final bool isCelsius;
   final void Function(WeatherData) onWeatherLoaded;
 
-  const SearchScreen({super.key, required this.isCelsius, required this.onWeatherLoaded});
+  const SearchScreen(
+      {super.key, required this.isCelsius, required this.onWeatherLoaded});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -79,9 +80,9 @@ class _SearchScreenState extends State<SearchScreen> {
         _isLoading = false;
       });
       widget.onWeatherLoaded(weatherData);
-
     } catch (e) {
-      _showError('Unable to fetch weather data. Please check your connection.');
+      _showError(
+          'Unable to fetch weather data. Please check your connection.');
       setState(() {
         _isLoading = false;
         _isViewingWeather = false;
@@ -92,7 +93,12 @@ class _SearchScreenState extends State<SearchScreen> {
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent.withValues(alpha: 0.9),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
     );
   }
 
@@ -101,37 +107,55 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_isViewingWeather) {
       return Column(
         children: [
+          const SizedBox(height: 8),
           Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   setState(() {
                     _isViewingWeather = false;
                     _weatherData = null;
                   });
                 },
-              ),
-              Text(
-                'Back to Saved',
-                style: GoogleFonts.outfit(color: Colors.white, fontSize: 18),
+                child: Row(
+                  children: [
+                    Icon(
+                      CupertinoIcons.chevron_left,
+                      color: Colors.white.withValues(alpha: 0.85),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Weather',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 17,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Expanded(
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
+              duration: const Duration(milliseconds: 400),
               child: _isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(color: Color(0xFF38BDF8)),
+                      child: CupertinoActivityIndicator(
+                        color: Colors.white,
+                        radius: 14,
+                      ),
                     )
                   : _weatherData != null
                       ? WeatherView(
                           currentLocation: _currentLocation!,
                           weatherData: _weatherData!,
                           isCelsius: widget.isCelsius,
-                          onRefresh: () => _fetchWeather('', existingLocation: _currentLocation),
+                          onRefresh: () => _fetchWeather('',
+                              existingLocation: _currentLocation),
                         )
                       : const SizedBox(),
             ),
@@ -143,36 +167,60 @@ class _SearchScreenState extends State<SearchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildTopSection().animate().fade(duration: 600.ms).slideY(begin: -0.2),
-        const SizedBox(height: 32),
+        const SizedBox(height: 8),
+        // Title
         Text(
-          'SAVED LOCATIONS',
-          style: GoogleFonts.outfit(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.white70,
-            letterSpacing: 2.0,
+          'Weather',
+          style: TextStyle(
+            fontSize: 34,
+            fontWeight: FontWeight.w700,
+            color: Colors.white.withValues(alpha: 0.95),
+            letterSpacing: 0.3,
           ),
-        ).animate().fade(delay: 200.ms),
-        const SizedBox(height: 16),
+        ).animate().fade(duration: 400.ms),
+        const SizedBox(height: 12),
+        // Search bar - iOS style
+        _buildSearchBar().animate().fade(duration: 400.ms),
+        const SizedBox(height: 24),
+        // Saved locations list
         Expanded(
           child: _savedLocations.isEmpty
               ? Center(
-                  child: Text(
-                    'No saved locations yet.\nSearch for a city above!',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.outfit(
-                      color: Colors.white54,
-                      fontSize: 16,
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CupertinoIcons.search,
+                        size: 48,
+                        color: Colors.white.withValues(alpha: 0.3),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No saved locations yet',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          fontSize: 17,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Search for a city to get started',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.35),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
                   ),
-                ).animate().fade(delay: 300.ms)
+                ).animate().fade(delay: 200.ms, duration: 400.ms)
               : ListView.builder(
                   physics: const BouncingScrollPhysics(),
                   itemCount: _savedLocations.length,
                   itemBuilder: (context, index) {
                     final loc = _savedLocations[index];
-                    return _buildLocationItem(loc, index);
+                    return _buildLocationCard(loc, index);
                   },
                 ),
         ),
@@ -180,44 +228,46 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildTopSection() {
+  Widget _buildSearchBar() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: BorderRadius.circular(10),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
+          height: 38,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.15),
-                Colors.white.withValues(alpha: 0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.2),
-              width: 1,
-            ),
+            color: Colors.white.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: TextField(
             controller: _searchController,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: 16,
+            ),
             decoration: InputDecoration(
-              hintText: 'Search new city...',
-              hintStyle: const TextStyle(color: Colors.white54),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.search, color: Colors.white70),
-                onPressed: _isLoading
-                    ? null
-                    : () {
-                        FocusScope.of(context).unfocus();
-                        _fetchWeather(_searchController.text);
-                      },
+              hintText: 'Search for a city or airport',
+              hintStyle: TextStyle(
+                color: Colors.white.withValues(alpha: 0.35),
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
               ),
+              border: InputBorder.none,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+              prefixIcon: Padding(
+                padding: const EdgeInsets.only(left: 8, right: 4),
+                child: Icon(
+                  CupertinoIcons.search,
+                  color: Colors.white.withValues(alpha: 0.4),
+                  size: 18,
+                ),
+              ),
+              prefixIconConstraints: const BoxConstraints(
+                minWidth: 34,
+                minHeight: 20,
+              ),
+              isDense: true,
             ),
             onSubmitted: (_) {
               if (!_isLoading) {
@@ -230,56 +280,86 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildLocationItem(Location loc, int index) {
+  Widget _buildLocationCard(Location loc, int index) {
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
         _fetchWeather('', existingLocation: loc);
       },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withValues(alpha: 0.12),
+                    Colors.white.withValues(alpha: 0.06),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  width: 0.5,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    loc.name,
-                    style: GoogleFonts.outfit(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.name,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.95),
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        if (loc.country.isNotEmpty)
+                          Text(
+                            loc.country,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                  if (loc.country.isNotEmpty)
-                    Text(
-                      loc.country,
-                      style: GoogleFonts.outfit(
-                        color: Colors.white70,
-                        fontSize: 14,
+                  GestureDetector(
+                    onTap: () async {
+                      await _storageService.removeLocation(loc);
+                      _loadSavedLocations();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Icon(
+                        CupertinoIcons.minus_circle,
+                        color: Colors.white.withValues(alpha: 0.35),
+                        size: 22,
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.white54),
-              onPressed: () async {
-                await _storageService.removeLocation(loc);
-                _loadSavedLocations();
-              },
-            ),
-          ],
+          ),
         ),
-      ).animate().fade(delay: (300 + index * 100).ms).slideX(begin: 0.1),
-    );
+      ),
+    )
+        .animate()
+        .fade(delay: (200 + index * 80).ms, duration: 400.ms)
+        .slideY(begin: 0.05);
   }
 }
