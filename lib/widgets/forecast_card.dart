@@ -36,7 +36,6 @@ class ForecastCard extends StatelessWidget {
     final icon = WeatherUtils.getWeatherIcon(forecast.weatherCode);
     final iconColor = WeatherUtils.getWeatherIconColor(forecast.weatherCode);
 
-    // Calculate positions for the temperature range bar
     final totalRange = weeklyMax - weeklyMin;
     final double startFraction =
         totalRange > 0 ? (forecast.minTemp - weeklyMin) / totalRange : 0.0;
@@ -44,76 +43,59 @@ class ForecastCard extends StatelessWidget {
         totalRange > 0 ? (forecast.maxTemp - weeklyMin) / totalRange : 1.0;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: SizedBox(
-        height: 44,
-        child: Row(
-          children: [
-            // Day name
-            SizedBox(
-              width: 46,
-              child: Text(
-                dayName,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.95),
-                  fontSize: 18,
-                  fontWeight: isToday ? FontWeight.w600 : FontWeight.w500,
-                  letterSpacing: -0.3,
-                ),
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 58,
+            child: Text(
+              dayName,
+              maxLines: 1,
+              overflow: TextOverflow.visible,
+              softWrap: false,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
               ),
             ),
-            // Weather icon
-            SizedBox(
-              width: 40,
-              child: Center(
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 22,
-                ),
+          ),
+          SizedBox(
+            width: 40,
+            child: Icon(icon, color: iconColor, size: 22),
+          ),
+          SizedBox(
+            width: 38,
+            child: Text(
+              _formatTemp(forecast.minTemp),
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.6),
+                fontSize: 18,
               ),
             ),
-            // Low temp
-            SizedBox(
-              width: 38,
-              child: Text(
-                _formatTemp(forecast.minTemp),
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: -0.3,
-                ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: _buildBar(startFraction, endFraction)),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 38,
+            child: Text(
+              _formatTemp(forecast.maxTemp),
+              textAlign: TextAlign.right,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(width: 10),
-            // Temperature range bar
-            Expanded(
-              child: _buildTempRangeBar(startFraction, endFraction),
-            ),
-            const SizedBox(width: 10),
-            // High temp
-            SizedBox(
-              width: 38,
-              child: Text(
-                _formatTemp(forecast.maxTemp),
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.95),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: -0.3,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildTempRangeBar(double startFraction, double endFraction) {
+  Widget _buildBar(double startFraction, double endFraction) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final totalWidth = constraints.maxWidth;
@@ -121,30 +103,26 @@ class ForecastCard extends StatelessWidget {
         final barEnd = endFraction * totalWidth;
         final barWidth = (barEnd - barStart).clamp(6.0, totalWidth);
 
-        // Gradient colors based on temperature range
-        final Color startColor = _getTempColor(forecast.minTemp);
-        final Color endColor = _getTempColor(forecast.maxTemp);
-
         return Stack(
           children: [
-            // Track background
             Container(
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
-            // Active range
-            Positioned(
-              left: barStart,
-              top: 0,
+            Padding(
+              padding: EdgeInsets.only(left: barStart),
               child: Container(
                 width: barWidth,
                 height: 5,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [startColor, endColor],
+                    colors: [
+                      WeatherUtils.getTempColor(forecast.minTemp),
+                      WeatherUtils.getTempColor(forecast.maxTemp),
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(3),
                 ),
@@ -154,22 +132,5 @@ class ForecastCard extends StatelessWidget {
         );
       },
     );
-  }
-
-  Color _getTempColor(double temp) {
-    // iOS-style temperature colors
-    if (!isCelsius) {
-      temp = (temp - 32) * 5 / 9; // Convert to Celsius for color logic
-    }
-    if (temp <= -10) return const Color(0xFF6366F1); // Deep indigo
-    if (temp <= 0) return const Color(0xFF38BDF8);   // Cyan-blue
-    if (temp <= 5) return const Color(0xFF22D3EE);   // Teal
-    if (temp <= 10) return const Color(0xFF2DD4BF);  // Teal-green
-    if (temp <= 15) return const Color(0xFF4ADE80);  // Green
-    if (temp <= 20) return const Color(0xFFA3E635);  // Lime
-    if (temp <= 25) return const Color(0xFFFBBF24);  // Yellow
-    if (temp <= 30) return const Color(0xFFF97316);  // Orange
-    if (temp <= 35) return const Color(0xFFEF4444);  // Red
-    return const Color(0xFFDC2626);                   // Deep red
   }
 }

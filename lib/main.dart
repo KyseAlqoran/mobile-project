@@ -12,7 +12,6 @@ void main() {
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(const WeatherApp());
 }
 
@@ -24,14 +23,6 @@ class WeatherApp extends StatelessWidget {
     return MaterialApp(
       title: 'Weather',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.transparent,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4A9AE6),
-          brightness: Brightness.dark,
-          primary: Colors.white,
-        ),
-      ),
       home: const MainNavigationScreen(),
     );
   }

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import '../models/weather_model.dart';
-import 'package:intl/intl.dart';
 
 class HourlyForecastCard extends StatelessWidget {
   final HourlyForecast forecast;
   final bool isCelsius;
   final bool isNow;
+  final bool currentIsDay;
 
   const HourlyForecastCard({
     super.key,
     required this.forecast,
     required this.isCelsius,
     this.isNow = false,
+    this.currentIsDay = true,
   });
 
   String _formatTemp(double temp) {
@@ -21,11 +22,22 @@ class HourlyForecastCard extends StatelessWidget {
     return '${temp.round()}°';
   }
 
+  String _formatHour(DateTime date) {
+    if (isNow) return 'Now';
+    int hour = date.hour;
+    final period = hour >= 12 ? 'PM' : 'AM';
+    int h12 = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    return '$h12 $period';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final icon = WeatherUtils.getWeatherIcon(forecast.weatherCode);
-    final iconColor = WeatherUtils.getWeatherIconColor(forecast.weatherCode);
-    final timeStr = isNow ? 'Now' : DateFormat.j().format(forecast.date);
+    final hour = forecast.date.hour;
+    final bool isDay = isNow ? currentIsDay : (hour >= 6 && hour < 19);
+    final icon =
+        WeatherUtils.getWeatherIcon(forecast.weatherCode, isDay: isDay);
+    final iconColor =
+        WeatherUtils.getWeatherIconColor(forecast.weatherCode, isDay: isDay);
 
     return SizedBox(
       width: 60,
@@ -33,28 +45,22 @@ class HourlyForecastCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            timeStr,
+            _formatHour(forecast.date),
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: Colors.white,
               fontSize: 15,
-              fontWeight: isNow ? FontWeight.w600 : FontWeight.w500,
-              letterSpacing: -0.2,
+              fontWeight: isNow ? FontWeight.bold : FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 14),
-          Icon(
-            icon,
-            color: iconColor,
-            size: 26,
-          ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 8),
+          Icon(icon, color: iconColor, size: 26),
+          const SizedBox(height: 8),
           Text(
             _formatTemp(forecast.temperature),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.95),
+            style: const TextStyle(
+              color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              letterSpacing: -0.3,
             ),
           ),
         ],

@@ -1,18 +1,18 @@
-import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/weather_model.dart';
 import '../services/weather_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/weather_view.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 class SearchScreen extends StatefulWidget {
   final bool isCelsius;
   final void Function(WeatherData) onWeatherLoaded;
 
-  const SearchScreen(
-      {super.key, required this.isCelsius, required this.onWeatherLoaded});
+  const SearchScreen({
+    super.key,
+    required this.isCelsius,
+    required this.onWeatherLoaded,
+  });
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -81,8 +81,7 @@ class _SearchScreenState extends State<SearchScreen> {
       });
       widget.onWeatherLoaded(weatherData);
     } catch (e) {
-      _showError(
-          'Unable to fetch weather data. Please check your connection.');
+      _showError('Unable to fetch weather data. Please check your connection.');
       setState(() {
         _isLoading = false;
         _isViewingWeather = false;
@@ -93,12 +92,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.redAccent.withValues(alpha: 0.9),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
+      SnackBar(content: Text(message)),
     );
   }
 
@@ -117,22 +111,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     _weatherData = null;
                   });
                 },
-                child: Row(
+                child: const Row(
                   children: [
-                    Icon(
-                      CupertinoIcons.chevron_left,
-                      color: Colors.white.withValues(alpha: 0.85),
-                      size: 20,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Weather',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.85),
-                        fontSize: 17,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
+                    Icon(Icons.chevron_left, color: Colors.white),
+                    Text('Back',
+                        style: TextStyle(color: Colors.white, fontSize: 17)),
                   ],
                 ),
               ),
@@ -140,25 +123,21 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
-              child: _isLoading
-                  ? const Center(
-                      child: CupertinoActivityIndicator(
-                        color: Colors.white,
-                        radius: 14,
-                      ),
-                    )
-                  : _weatherData != null
-                      ? WeatherView(
-                          currentLocation: _currentLocation!,
-                          weatherData: _weatherData!,
-                          isCelsius: widget.isCelsius,
-                          onRefresh: () => _fetchWeather('',
-                              existingLocation: _currentLocation),
-                        )
-                      : const SizedBox(),
-            ),
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  )
+                : _weatherData != null
+                    ? WeatherView(
+                        currentLocation: _currentLocation!,
+                        weatherData: _weatherData!,
+                        isCelsius: widget.isCelsius,
+                        onRefresh: () => _fetchWeather(
+                          '',
+                          existingLocation: _currentLocation,
+                        ),
+                      )
+                    : const SizedBox(),
           ),
         ],
       );
@@ -168,59 +147,50 @@ class _SearchScreenState extends State<SearchScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 8),
-        // Title
-        Text(
+        const Text(
           'Weather',
           style: TextStyle(
-            fontSize: 34,
-            fontWeight: FontWeight.w700,
-            color: Colors.white.withValues(alpha: 0.95),
-            letterSpacing: 0.3,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
-        ).animate().fade(duration: 400.ms),
+        ),
         const SizedBox(height: 12),
-        // Search bar - iOS style
-        _buildSearchBar().animate().fade(duration: 400.ms),
-        const SizedBox(height: 24),
-        // Saved locations list
+        TextField(
+          controller: _searchController,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Search for a city',
+            hintStyle: const TextStyle(color: Colors.white54),
+            prefixIcon: const Icon(Icons.search, color: Colors.white54),
+            filled: true,
+            fillColor: Colors.white.withValues(alpha: 0.15),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          onSubmitted: (_) {
+            if (!_isLoading) {
+              _fetchWeather(_searchController.text);
+            }
+          },
+        ),
+        const SizedBox(height: 20),
         Expanded(
           child: _savedLocations.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        CupertinoIcons.search,
-                        size: 48,
-                        color: Colors.white.withValues(alpha: 0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No saved locations yet',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          fontSize: 17,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Search for a city to get started',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.35),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
+              ? const Center(
+                  child: Text(
+                    'No saved locations yet.\nSearch for a city to start.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white54, fontSize: 16),
                   ),
-                ).animate().fade(delay: 200.ms, duration: 400.ms)
+                )
               : ListView.builder(
-                  physics: const BouncingScrollPhysics(),
                   itemCount: _savedLocations.length,
                   itemBuilder: (context, index) {
                     final loc = _savedLocations[index];
-                    return _buildLocationCard(loc, index);
+                    return _buildLocationCard(loc);
                   },
                 ),
         ),
@@ -228,138 +198,47 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          height: 38,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: TextField(
-            controller: _searchController,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 16,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Search for a city or airport',
-              hintStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.35),
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
-              border: InputBorder.none,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(left: 8, right: 4),
-                child: Icon(
-                  CupertinoIcons.search,
-                  color: Colors.white.withValues(alpha: 0.4),
-                  size: 18,
-                ),
-              ),
-              prefixIconConstraints: const BoxConstraints(
-                minWidth: 34,
-                minHeight: 20,
-              ),
-              isDense: true,
-            ),
-            onSubmitted: (_) {
-              if (!_isLoading) {
-                _fetchWeather(_searchController.text);
-              }
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLocationCard(Location loc, int index) {
+  Widget _buildLocationCard(Location loc) {
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
         _fetchWeather('', existingLocation: loc);
       },
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: ClipRRect(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(16),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.12),
-                    Colors.white.withValues(alpha: 0.06),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  loc.name,
+                  style: const TextStyle(color: Colors.white, fontSize: 20),
                 ),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  width: 0.5,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          loc.name,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.95),
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        if (loc.country.isNotEmpty)
-                          Text(
-                            loc.country,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                      ],
-                    ),
+                if (loc.country.isNotEmpty)
+                  Text(
+                    loc.country,
+                    style: const TextStyle(color: Colors.white54, fontSize: 14),
                   ),
-                  GestureDetector(
-                    onTap: () async {
-                      await _storageService.removeLocation(loc);
-                      _loadSavedLocations();
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: Icon(
-                        CupertinoIcons.minus_circle,
-                        color: Colors.white.withValues(alpha: 0.35),
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
-          ),
+            GestureDetector(
+              onTap: () async {
+                await _storageService.removeLocation(loc);
+                _loadSavedLocations();
+              },
+              child: const Icon(Icons.remove_circle_outline,
+                  color: Colors.white54),
+            ),
+          ],
         ),
       ),
-    )
-        .animate()
-        .fade(delay: (200 + index * 80).ms, duration: 400.ms)
-        .slideY(begin: 0.05);
+    );
   }
 }

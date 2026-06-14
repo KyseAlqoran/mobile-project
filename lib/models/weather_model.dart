@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Location {
@@ -18,8 +17,8 @@ class Location {
     return Location(
       name: json['name'] ?? '',
       country: json['country'] ?? '',
-      latitude: json['latitude'] ?? 0.0,
-      longitude: json['longitude'] ?? 0.0,
+      latitude: (json['latitude'] ?? 0).toDouble(),
+      longitude: (json['longitude'] ?? 0).toDouble(),
     );
   }
 
@@ -66,19 +65,6 @@ class CurrentWeather {
       isDay: json['is_day'] ?? 1,
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'temperature_2m': temperature,
-      'apparent_temperature': apparentTemperature,
-      'relative_humidity_2m': humidity,
-      'wind_speed_10m': windSpeed,
-      'weather_code': weatherCode,
-      'surface_pressure': surfacePressure,
-      'visibility': visibility,
-      'is_day': isDay,
-    };
-  }
 }
 
 class HourlyForecast {
@@ -91,14 +77,6 @@ class HourlyForecast {
     required this.temperature,
     required this.weatherCode,
   });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'time': date.toIso8601String(),
-      'temperature_2m': temperature,
-      'weather_code': weatherCode,
-    };
-  }
 }
 
 class DailyForecast {
@@ -121,19 +99,6 @@ class DailyForecast {
     required this.sunset,
     required this.uvIndexMax,
   });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'time': date.toIso8601String(),
-      'temperature_2m_max': maxTemp,
-      'temperature_2m_min': minTemp,
-      'weather_code': weatherCode,
-      'precipitation_sum': precipitation,
-      'sunrise': sunrise,
-      'sunset': sunset,
-      'uv_index_max': uvIndexMax,
-    };
-  }
 }
 
 class WeatherData {
@@ -141,10 +106,14 @@ class WeatherData {
   final List<DailyForecast> daily;
   final List<HourlyForecast> hourly;
 
-  WeatherData({required this.current, required this.daily, required this.hourly});
+  WeatherData({
+    required this.current,
+    required this.daily,
+    required this.hourly,
+  });
 
   factory WeatherData.fromJson(Map<String, dynamic> json) {
-    final current = CurrentWeather.fromJson(json['current'] ?? json['current_weather'] ?? json);
+    final current = CurrentWeather.fromJson(json['current'] ?? {});
 
     final dailyJson = json['daily'] ?? {};
     final List<dynamic> dailyTimes = dailyJson['time'] ?? [];
@@ -164,7 +133,8 @@ class WeatherData {
           maxTemp: (maxTemps.length > i ? maxTemps[i] ?? 0 : 0).toDouble(),
           minTemp: (minTemps.length > i ? minTemps[i] ?? 0 : 0).toDouble(),
           weatherCode: dailyCodes.length > i ? dailyCodes[i] ?? 0 : 0,
-          precipitation: (precipitations.length > i ? precipitations[i] ?? 0 : 0).toDouble(),
+          precipitation:
+              (precipitations.length > i ? precipitations[i] ?? 0 : 0).toDouble(),
           sunrise: sunrises.length > i ? sunrises[i]?.toString() ?? '' : '',
           sunset: sunsets.length > i ? sunsets[i]?.toString() ?? '' : '',
           uvIndexMax: (uvIndexes.length > i ? uvIndexes[i] ?? 0 : 0).toDouble(),
@@ -190,27 +160,6 @@ class WeatherData {
 
     return WeatherData(current: current, daily: daily, hourly: hourly);
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'current': current.toJson(),
-      'daily': {
-        'time': daily.map((e) => e.date.toIso8601String()).toList(),
-        'temperature_2m_max': daily.map((e) => e.maxTemp).toList(),
-        'temperature_2m_min': daily.map((e) => e.minTemp).toList(),
-        'weather_code': daily.map((e) => e.weatherCode).toList(),
-        'precipitation_sum': daily.map((e) => e.precipitation).toList(),
-        'sunrise': daily.map((e) => e.sunrise).toList(),
-        'sunset': daily.map((e) => e.sunset).toList(),
-        'uv_index_max': daily.map((e) => e.uvIndexMax).toList(),
-      },
-      'hourly': {
-        'time': hourly.map((e) => e.date.toIso8601String()).toList(),
-        'temperature_2m': hourly.map((e) => e.temperature).toList(),
-        'weather_code': hourly.map((e) => e.weatherCode).toList(),
-      }
-    };
-  }
 }
 
 class WeatherUtils {
@@ -230,73 +179,72 @@ class WeatherUtils {
     return 'Unknown';
   }
 
-  static String getWeatherEmoji(int code) {
-    if (code == 0) return '☀️';
-    if (code == 1) return '🌤';
-    if (code == 2) return '⛅';
-    if (code == 3) return '🌥';
-    if (code >= 45 && code <= 48) return '🌫';
-    if (code >= 51 && code <= 55) return '🌦';
-    if (code >= 61 && code <= 65) return '🌧';
-    if (code >= 71 && code <= 75) return '❄️';
-    if (code >= 80 && code <= 82) return '🌧';
-    if (code >= 85 && code <= 86) return '🌨';
-    if (code == 95 || code == 99) return '⛈';
-    return '🌡';
-  }
-
-  /// Returns a Cupertino/Material icon matching the iOS Weather app style.
   static IconData getWeatherIcon(int code, {bool isDay = true}) {
     if (code == 0) {
-      return isDay ? CupertinoIcons.sun_max_fill : CupertinoIcons.moon_stars_fill;
+      return isDay ? Icons.sunny : Icons.nights_stay;
     }
     if (code == 1) {
-      return isDay ? CupertinoIcons.sun_min_fill : CupertinoIcons.moon_fill;
+      return isDay ? Icons.sunny : Icons.nights_stay;
     }
-    if (code == 2) {
-      return isDay ? CupertinoIcons.cloud_sun_fill : CupertinoIcons.cloud_moon_fill;
-    }
-    if (code == 3) return CupertinoIcons.cloud_fill;
-    if (code >= 45 && code <= 48) return CupertinoIcons.cloud_fog_fill;
-    if (code >= 51 && code <= 55) return CupertinoIcons.cloud_drizzle_fill;
-    if (code >= 61 && code <= 65) return CupertinoIcons.cloud_rain_fill;
-    if (code >= 71 && code <= 75) return CupertinoIcons.cloud_snow_fill;
-    if (code >= 80 && code <= 82) return CupertinoIcons.cloud_heavyrain_fill;
-    if (code >= 85 && code <= 86) return CupertinoIcons.cloud_snow_fill;
-    if (code == 95 || code == 99) return CupertinoIcons.cloud_bolt_rain_fill;
-    return CupertinoIcons.thermometer;
+    if (code == 2) return Icons.cloud;
+    if (code == 3) return Icons.cloud;
+    if (code >= 45 && code <= 48) return Icons.cloud; 
+    if (code >= 51 && code <= 55) return Icons.cloudy_snowing; 
+    if (code >= 61 && code <= 65) return Icons.cloudy_snowing;
+    if (code >= 71 && code <= 75) return Icons.cloudy_snowing; 
+    if (code >= 80 && code <= 82) return Icons.cloudy_snowing; 
+    if (code >= 85 && code <= 86) return Icons.cloudy_snowing; 
+    if (code == 95 || code == 99) return Icons.thunderstorm; 
+    return Icons.thermostat;
   }
 
-  /// Returns the iOS-style weather icon color.
   static Color getWeatherIconColor(int code, {bool isDay = true}) {
-    if (code == 0) return isDay ? const Color(0xFFFBBF24) : const Color(0xFFFCD34D);
-    if (code == 1) return isDay ? const Color(0xFFFBBF24) : const Color(0xFFE2E8F0);
-    if (code == 2) return const Color(0xFFE2E8F0);
-    if (code == 3) return const Color(0xFFCBD5E1);
-    if (code >= 45 && code <= 48) return const Color(0xFF94A3B8);
-    if (code >= 51 && code <= 55) return const Color(0xFF93C5FD);
-    if (code >= 61 && code <= 65) return const Color(0xFF60A5FA);
+    if (code == 0 || code == 1) {
+      return isDay ? const Color(0xFFFBBF24) : const Color(0xFFE2E8F0);
+    }
+    if (code == 2 || code == 3) return const Color(0xFFE2E8F0); 
+    if (code >= 45 && code <= 48) return const Color(0xFFE2E8F0); 
+    if (code >= 51 && code <= 55) return const Color(0xFF93C5FD); 
+    if (code >= 61 && code <= 65) return const Color(0xFF93C5FD); 
     if (code >= 71 && code <= 75) return const Color(0xFFE2E8F0);
-    if (code >= 80 && code <= 82) return const Color(0xFF60A5FA);
-    if (code >= 85 && code <= 86) return const Color(0xFFE2E8F0);
-    if (code == 95 || code == 99) return const Color(0xFFFBBF24);
-    return Colors.white;
+    if (code >= 80 && code <= 82) return const Color(0xFF93C5FD); 
+    if (code >= 85 && code <= 86) return const Color(0xFFE2E8F0); 
+    if (code == 95 || code == 99) return const Color(0xFFFBBF24); 
+    return const Color(0xFFE2E8F0);
   }
 
-  /// Returns a short description sentence for the hourly section header.
-  static String getWeatherDescription(int code, String label) {
-    if (code == 0) return 'Clear conditions throughout the day.';
-    if (code == 1) return 'Mainly clear skies expected.';
-    if (code == 2) return 'Partly cloudy conditions expected.';
-    if (code == 3) return 'Overcast skies throughout the day.';
-    if (code >= 45 && code <= 48) return 'Fog is expected to develop.';
-    if (code >= 51 && code <= 55) return 'Light drizzle expected throughout the day.';
-    if (code >= 61 && code <= 65) return 'Rain expected. Consider bringing an umbrella.';
-    if (code >= 71 && code <= 75) return 'Snowfall expected throughout the day.';
-    if (code >= 80 && code <= 82) return 'Rain showers expected intermittently.';
-    if (code >= 85 && code <= 86) return 'Snow showers expected intermittently.';
-    if (code == 95) return 'Thunderstorms are expected.';
-    if (code == 99) return 'Severe thunderstorms expected. Stay safe.';
-    return '$label conditions expected.';
+  static List<Color> getBackgroundColors(int code, int isDay) {
+    if (isDay == 0) {
+      return [const Color(0xFF0A1628), const Color(0xFF1E3A6B)];
+    }
+    if (code == 0 || code == 1) {
+      return [const Color(0xFF1B3A5C), const Color(0xFF4A9AE6)];
+    }
+    if (code == 2 || code == 3) {
+      return [const Color(0xFF4A5568), const Color(0xFF8D9BB0)];
+    }
+    if (code >= 45 && code <= 48) {
+      return [const Color(0xFF4A5568), const Color(0xFF8B9DB5)];
+    }
+    if (code >= 51 && code <= 65) {
+      return [const Color(0xFF1A2332), const Color(0xFF4E6480)];
+    }
+    if (code >= 71 && code <= 86) {
+      return [const Color(0xFF4A5568), const Color(0xFFA8B8CC)];
+    }
+    if (code == 95 || code == 99) {
+      return [const Color(0xFF0D1117), const Color(0xFF2B3139)];
+    }
+    return [const Color(0xFF1B3A5C), const Color(0xFF4A7FB5)];
+  }
+
+  static Color getTempColor(double tempC) {
+    if (tempC <= 5) return const Color(0xFF22D3EE);
+    if (tempC <= 12) return const Color(0xFF4ADE80); 
+    if (tempC <= 18) return const Color(0xFFA3E635); 
+    if (tempC <= 23) return const Color(0xFFFBBF24); 
+    if (tempC <= 28) return const Color(0xFFF59E0B);
+    if (tempC <= 33) return const Color(0xFFF97316);
+    return const Color(0xFFEF4444);
   }
 }

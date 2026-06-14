@@ -9,24 +9,44 @@ class WeatherService {
     ),
   );
 
+  WeatherService() {
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          // ignore: avoid_print
+          print('Request sent to: ${options.uri}');
+          handler.next(options);
+        },
+        onResponse: (response, handler) {
+          // ignore: avoid_print
+          print('Response code: ${response.statusCode}');
+          handler.next(response);
+        },
+        onError: (error, handler) {
+          // ignore: avoid_print
+          print('Dio error: ${error.message}');
+          handler.next(error);
+        },
+      ),
+    );
+  }
+
   Future<Location?> geocodeCity(String cityName) async {
     try {
       final response = await _dio.get(
         'https://geocoding-api.open-meteo.com/v1/search',
         queryParameters: {
           'name': cityName,
-          'count': 5,
+          'count': 1,
           'language': 'en',
           'format': 'json',
         },
       );
 
       final data = response.data;
-
       if (data['results'] != null && data['results'].isNotEmpty) {
         return Location.fromJson(data['results'][0]);
       }
-
       return null;
     } on DioException catch (e) {
       throw Exception(_getErrorMessage(e));
