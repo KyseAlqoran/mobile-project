@@ -65,7 +65,7 @@ class WeatherService {
           'latitude': lat,
           'longitude': lon,
           'current':
-              'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature,surface_pressure,visibility,is_day',
+              'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature,pressure_msl,visibility,is_day',
           'hourly': 'temperature_2m,weather_code',
           'daily':
               'temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,sunrise,sunset,uv_index_max',

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
+<<<<<<< HEAD
 // ----------------------------
 // Location model
 // ----------------------------
+=======
+// Ameer Al7ob
+>>>>>>> 40f5d9d (Version 3)
 class Location {
   final String name;
   final String country;
@@ -65,8 +69,13 @@ class CurrentWeather {
       apparentTemperature: (json['apparent_temperature'] ?? 0).toDouble(),
       humidity: json['relative_humidity_2m'] ?? 0,
       windSpeed: (json['wind_speed_10m'] ?? 0).toDouble(),
+<<<<<<< HEAD
       weatherCode: (json['weather_code'] ?? 0).toInt(),
       surfacePressure: (json['surface_pressure'] ?? 0).toDouble(),
+=======
+      weatherCode: json['weather_code'] ?? 0,
+      surfacePressure: (json['pressure_msl'] ?? 0).toDouble(),
+>>>>>>> 40f5d9d (Version 3)
       visibility: (json['visibility'] ?? 0).toDouble(),
       isDay: json['is_day'] ?? 1,
     );
@@ -152,7 +161,8 @@ class WeatherData {
               ? (dailyCodes[i] ?? 0).toInt()
               : 0,
           precipitation:
-              (precipitations.length > i ? precipitations[i] ?? 0 : 0).toDouble(),
+              (precipitations.length > i ? precipitations[i] ?? 0 : 0)
+                  .toDouble(),
           sunrise: sunrises.length > i ? sunrises[i]?.toString() ?? '' : '',
           sunset: sunsets.length > i ? sunsets[i]?.toString() ?? '' : '',
           uvIndexMax: (uvIndexes.length > i ? uvIndexes[i] ?? 0 : 0).toDouble(),
@@ -171,10 +181,16 @@ class WeatherData {
       hourly.add(
         HourlyForecast(
           date: DateTime.tryParse(hourlyTimes[i].toString()) ?? DateTime.now(),
+<<<<<<< HEAD
           temperature: (hourlyTemps.length > i ? hourlyTemps[i] ?? 0 : 0).toDouble(),
           weatherCode: hourlyCodes.length > i
               ? (hourlyCodes[i] ?? 0).toInt()
               : 0,
+=======
+          temperature:
+              (hourlyTemps.length > i ? hourlyTemps[i] ?? 0 : 0).toDouble(),
+          weatherCode: hourlyCodes.length > i ? hourlyCodes[i] ?? 0 : 0,
+>>>>>>> 40f5d9d (Version 3)
         ),
       );
     }
@@ -228,6 +244,7 @@ class WeatherUtils {
     if (code == 1) {
       return isDay ? Icons.sunny : Icons.nights_stay;
     }
+<<<<<<< HEAD
     if (code == 2) return Icons.wb_cloudy; // partly cloudy
     if (code == 3) return Icons.cloud; // overcast
     if (code >= 45 && code <= 48) return Icons.cloud; // fog
@@ -237,6 +254,17 @@ class WeatherUtils {
     if (code >= 80 && code <= 82) return Icons.water_drop_rounded; // rain showers
     if (code >= 85 && code <= 86) return Icons.ac_unit; // snow showers
     if (code == 95 || code == 99) return Icons.thunderstorm; // storm
+=======
+    if (code == 2) return Icons.cloud;
+    if (code == 3) return Icons.cloud;
+    if (code >= 45 && code <= 48) return Icons.cloud;
+    if (code >= 51 && code <= 55) return Icons.cloudy_snowing;
+    if (code >= 61 && code <= 65) return Icons.cloudy_snowing;
+    if (code >= 71 && code <= 75) return Icons.cloudy_snowing;
+    if (code >= 80 && code <= 82) return Icons.cloudy_snowing;
+    if (code >= 85 && code <= 86) return Icons.cloudy_snowing;
+    if (code == 95 || code == 99) return Icons.thunderstorm;
+>>>>>>> 40f5d9d (Version 3)
     return Icons.thermostat;
   }
 
@@ -246,6 +274,7 @@ class WeatherUtils {
       // Sun is yellow in the day, moon is soft white at night
       return isDay ? const Color(0xFFFBBF24) : const Color(0xFFE2E8F0);
     }
+<<<<<<< HEAD
     if (code == 2 || code == 3) return const Color(0xFFE2E8F0); // cloud light
     if (code >= 45 && code <= 48) return const Color(0xFFE2E8F0); // fog light
     if (code >= 51 && code <= 55) return const Color(0xFF93C5FD); // drizzle light blue
@@ -254,6 +283,16 @@ class WeatherUtils {
     if (code >= 80 && code <= 82) return const Color(0xFF93C5FD); // rain showers light blue
     if (code >= 85 && code <= 86) return const Color(0xFFE2E8F0); // snow showers white
     if (code == 95 || code == 99) return const Color(0xFFFBBF24); // storm yellow
+=======
+    if (code == 2 || code == 3) return const Color(0xFFE2E8F0);
+    if (code >= 45 && code <= 48) return const Color(0xFFE2E8F0);
+    if (code >= 51 && code <= 55) return const Color(0xFF93C5FD);
+    if (code >= 61 && code <= 65) return const Color(0xFF93C5FD);
+    if (code >= 71 && code <= 75) return const Color(0xFFE2E8F0);
+    if (code >= 80 && code <= 82) return const Color(0xFF93C5FD);
+    if (code >= 85 && code <= 86) return const Color(0xFFE2E8F0);
+    if (code == 95 || code == 99) return const Color(0xFFFBBF24);
+>>>>>>> 40f5d9d (Version 3)
     return const Color(0xFFE2E8F0);
   }
 
@@ -292,6 +331,7 @@ class WeatherUtils {
 
   // Color for a temperature (used in the 7-day bars)
   static Color getTempColor(double tempC) {
+<<<<<<< HEAD
     if (tempC <= 5) return const Color(0xFF22D3EE); // cyan (cold)
     if (tempC <= 12) return const Color(0xFF4ADE80); // green
     if (tempC <= 18) return const Color(0xFFA3E635); // lime
@@ -299,5 +339,14 @@ class WeatherUtils {
     if (tempC <= 28) return const Color(0xFFF59E0B); // amber
     if (tempC <= 33) return const Color(0xFFF97316); // orange
     return const Color(0xFFEF4444); // red (hot)
+=======
+    if (tempC <= 5) return const Color(0xFF22D3EE);
+    if (tempC <= 12) return const Color(0xFF4ADE80);
+    if (tempC <= 18) return const Color(0xFFA3E635);
+    if (tempC <= 23) return const Color(0xFFFBBF24);
+    if (tempC <= 28) return const Color(0xFFF59E0B);
+    if (tempC <= 33) return const Color(0xFFF97316);
+    return const Color(0xFFEF4444);
+>>>>>>> 40f5d9d (Version 3)
   }
 }

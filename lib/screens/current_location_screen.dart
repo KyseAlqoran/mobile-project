@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import '../models/weather_model.dart';
 import '../services/weather_service.dart';
 import '../widgets/weather_view.dart';
+import 'package:geocoding/geocoding.dart' as geo;
 
 class CurrentLocationScreen extends StatefulWidget {
   final bool isCelsius;
@@ -60,10 +61,40 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
       // 3. Get the position
       Position position = await Geolocator.getCurrentPosition();
 
+<<<<<<< HEAD
       // 4. Build a location (labeled "My Location")
+=======
+      String cityName = 'Current Location';
+      String countryName = '';
+
+      try {
+        final placemarks = await geo.placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          final place = placemarks.first;
+
+          cityName = place.locality?.isNotEmpty == true
+              ? place.locality!
+              : place.subAdministrativeArea?.isNotEmpty == true
+                  ? place.subAdministrativeArea!
+                  : place.administrativeArea?.isNotEmpty == true
+                      ? place.administrativeArea!
+                      : 'Current Location';
+
+          countryName = place.country ?? '';
+        }
+      } catch (_) {
+        cityName = 'Current Location';
+        countryName = '';
+      }
+
+>>>>>>> 40f5d9d (Version 3)
       final location = Location(
-        name: 'My Location',
-        country: '',
+        name: cityName,
+        country: countryName,
         latitude: position.latitude,
         longitude: position.longitude,
       );
