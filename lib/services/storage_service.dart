@@ -5,6 +5,7 @@ import '../models/weather_model.dart';
 class StorageService {
   static const String _locationsKey = 'saved_locations';
 
+  // Read the saved cities list
   Future<List<Location>> getSavedLocations() async {
     final prefs = await SharedPreferences.getInstance();
     final String? locationsJson = prefs.getString(_locationsKey);
@@ -18,6 +19,7 @@ class StorageService {
     }
   }
 
+  // Add one city (skip if it is already saved)
   Future<void> saveLocation(Location location) async {
     final locations = await getSavedLocations();
     bool alreadySaved = locations.any(
@@ -32,6 +34,7 @@ class StorageService {
     }
   }
 
+  // Remove one city
   Future<void> removeLocation(Location location) async {
     final locations = await getSavedLocations();
     locations.removeWhere(

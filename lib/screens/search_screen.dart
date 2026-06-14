@@ -98,6 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // When a city is picked, show its weather with a back button
     if (_isViewingWeather) {
       return Column(
         children: [
@@ -143,6 +144,7 @@ class _SearchScreenState extends State<SearchScreen> {
       );
     }
 
+    // The search list view
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -156,6 +158,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ),
         const SizedBox(height: 12),
+        // Search field (TextField like the Hello App example)
         TextField(
           controller: _searchController,
           style: const TextStyle(color: Colors.white),
@@ -177,6 +180,7 @@ class _SearchScreenState extends State<SearchScreen> {
           },
         ),
         const SizedBox(height: 20),
+        // Saved cities (ListView.builder like the posts example)
         Expanded(
           child: _savedLocations.isEmpty
               ? const Center(

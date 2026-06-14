@@ -10,6 +10,8 @@ class WeatherService {
   );
 
   WeatherService() {
+    // Dio interceptor: runs before every request and after every response.
+    // This is one of the main Dio features for our topic.
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
@@ -31,6 +33,7 @@ class WeatherService {
     );
   }
 
+  // Turn a city name into a Location (latitude + longitude)
   Future<Location?> geocodeCity(String cityName) async {
     try {
       final response = await _dio.get(
@@ -53,6 +56,7 @@ class WeatherService {
     }
   }
 
+  // Get the weather for a latitude / longitude
   Future<WeatherData> getWeather(double lat, double lon) async {
     try {
       final response = await _dio.get(
@@ -76,6 +80,7 @@ class WeatherService {
     }
   }
 
+  // Turn a Dio error into a simple message for the user
   String _getErrorMessage(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:

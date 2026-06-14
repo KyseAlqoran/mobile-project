@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/weather_model.dart';
 import 'forecast_card.dart';
 import 'hourly_forecast_card.dart';
@@ -24,6 +25,8 @@ class WeatherView extends StatelessWidget {
     return '${temp.round()}°';
   }
 
+  // A reusable semi-transparent card (the iPhone "glass" look, made with a
+  // simple Container + BoxDecoration like in the example apps).
   Widget _card({required Widget child}) {
     return Container(
       width: double.infinity,
@@ -42,21 +45,19 @@ class WeatherView extends StatelessWidget {
     final current = weatherData.current;
     final daily = weatherData.daily.isNotEmpty ? weatherData.daily.first : null;
     final label = WeatherUtils.getWeatherLabel(current.weatherCode);
-    final icon = WeatherUtils.getWeatherIcon(
-      current.weatherCode,
-      isDay: current.isDay == 1,
-    );
-    final iconColor = WeatherUtils.getWeatherIconColor(
+    final iconSvg = WeatherUtils.getWeatherSvg(
       current.weatherCode,
       isDay: current.isDay == 1,
     );
 
+    // Next 24 hours from now
     final now = DateTime.now();
     final upcomingHourly = weatherData.hourly
         .where((h) => h.date.isAfter(now.subtract(const Duration(hours: 1))))
         .take(24)
         .toList();
 
+    // Weekly min / max for the daily bars
     double weeklyMin = 100;
     double weeklyMax = -100;
     for (final d in weatherData.daily) {
@@ -74,6 +75,7 @@ class WeatherView extends StatelessWidget {
           children: [
             const SizedBox(height: 20),
 
+            // ----- Top part: city, icon, big temp, condition, H/L -----
             SizedBox(
               width: double.infinity,
               child: FittedBox(
@@ -88,7 +90,7 @@ class WeatherView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Icon(icon, color: iconColor, size: 72),
+            SvgPicture.asset(iconSvg, width: 80, height: 80),
             const SizedBox(height: 8),
             Text(
               _formatTemp(current.temperature),
@@ -113,10 +115,13 @@ class WeatherView extends StatelessWidget {
 
             const SizedBox(height: 30),
 
+            // ----- Hourly forecast card -----
             if (upcomingHourly.isNotEmpty) _buildHourlyCard(upcomingHourly),
 
+            // ----- 7-day forecast card -----
             _buildDailyCard(weeklyMin, weeklyMax),
 
+            // ----- Detail tiles (2 columns) -----
             _buildDetailGrid(current, daily),
 
             const SizedBox(height: 40),
@@ -126,6 +131,7 @@ class WeatherView extends StatelessWidget {
     );
   }
 
+  // Hourly card: a title, then a sideways ListView (like the posts app, but horizontal)
   Widget _buildHourlyCard(List<HourlyForecast> upcomingHourly) {
     return _card(
       child: Column(
@@ -160,6 +166,7 @@ class WeatherView extends StatelessWidget {
     );
   }
 
+  // 7-day card: a title, then one ForecastCard row per day
   Widget _buildDailyCard(double weeklyMin, double weeklyMax) {
     return _card(
       child: Column(
@@ -174,6 +181,7 @@ class WeatherView extends StatelessWidget {
             ),
           ),
           const Divider(color: Colors.white24),
+          // Build one row for each day
           ...weatherData.daily.asMap().entries.map((entry) {
             return ForecastCard(
               forecast: entry.value,
@@ -188,6 +196,7 @@ class WeatherView extends StatelessWidget {
     );
   }
 
+  // 2-column grid of small detail tiles
   Widget _buildDetailGrid(CurrentWeather current, DailyForecast? daily) {
     return GridView.count(
       crossAxisCount: 2,
@@ -214,6 +223,7 @@ class WeatherView extends StatelessWidget {
     );
   }
 
+  // One small detail tile (icon + label on top, big value below)
   Widget _tile(IconData icon, String label, String value) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -225,6 +235,7 @@ class WeatherView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Icon + label in a row, like iPhone
           Row(
             children: [
               Icon(
@@ -256,6 +267,7 @@ class WeatherView extends StatelessWidget {
     );
   }
 
+  // Turn an API time like "2024-01-01T06:30" into "6:30 AM"
   String _formatTime(String isoTime) {
     if (isoTime.isEmpty || !isoTime.contains('T')) return '--';
     final parts = isoTime.split('T');

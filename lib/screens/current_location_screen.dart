@@ -39,11 +39,13 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     });
 
     try {
+      // 1. Check location service is on
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         throw Exception('Location services are disabled.');
       }
 
+      // 2. Check permission
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -55,8 +57,10 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
         throw Exception('Location permissions are permanently denied.');
       }
 
+      // 3. Get the position
       Position position = await Geolocator.getCurrentPosition();
 
+      // 4. Build a location (labeled "My Location")
       final location = Location(
         name: 'My Location',
         country: '',
@@ -64,6 +68,7 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
         longitude: position.longitude,
       );
 
+      // 5. Get the weather
       final weatherData = await _weatherService.getWeather(
         position.latitude,
         position.longitude,
@@ -89,12 +94,14 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Loading spinner
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(color: Colors.white),
       );
     }
 
+    // Error message with a try again button
     if (_errorMessage != null) {
       return Center(
         child: Column(

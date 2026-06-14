@@ -24,6 +24,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // The two pages
     final pages = [
       CurrentLocationScreen(
         isCelsius: _isCelsius,
@@ -38,6 +39,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
+      // No AppBar (like iPhone). Gradient fills the screen, content on top.
       body: Stack(
         children: [
           WeatherBackground(weatherData: _currentWeatherData),
@@ -46,6 +48,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
+                  // Top row: just the °C / °F toggle on the right
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -64,6 +67,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       ),
                     ),
                   ),
+                  // The current page fills the rest
                   Expanded(
                     child: IndexedStack(
                       index: _currentIndex,
@@ -76,10 +80,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
         ],
       ),
+      // Our own see-through bottom bar
       bottomNavigationBar: _buildBottomBar(),
     );
   }
 
+  // A simple see-through bottom bar built with Container + Row (example style)
   Widget _buildBottomBar() {
     return Container(
       decoration: BoxDecoration(

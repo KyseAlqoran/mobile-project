@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/weather_model.dart';
 
 class HourlyForecastCard extends StatelessWidget {
@@ -22,6 +23,7 @@ class HourlyForecastCard extends StatelessWidget {
     return '${temp.round()}°';
   }
 
+  // Make a simple "3 PM" style time without the intl package
   String _formatHour(DateTime date) {
     if (isNow) return 'Now';
     int hour = date.hour;
@@ -32,12 +34,12 @@ class HourlyForecastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // For the "Now" card, use the real day/night value from the API.
+    // For future hours, guess from the hour (6 AM to 7 PM = day).
     final hour = forecast.date.hour;
     final bool isDay = isNow ? currentIsDay : (hour >= 6 && hour < 19);
-    final icon =
-        WeatherUtils.getWeatherIcon(forecast.weatherCode, isDay: isDay);
-    final iconColor =
-        WeatherUtils.getWeatherIconColor(forecast.weatherCode, isDay: isDay);
+    final iconSvg =
+        WeatherUtils.getWeatherSvg(forecast.weatherCode, isDay: isDay);
 
     return SizedBox(
       width: 60,
@@ -53,7 +55,7 @@ class HourlyForecastCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Icon(icon, color: iconColor, size: 26),
+          SvgPicture.asset(iconSvg, width: 30, height: 30),
           const SizedBox(height: 8),
           Text(
             _formatTemp(forecast.temperature),
