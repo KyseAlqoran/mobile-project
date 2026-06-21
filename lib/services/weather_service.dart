@@ -41,7 +41,6 @@ class WeatherService {
     final suggestions = await geocodeCitySuggestions(cityName, count: 1);
     if (suggestions.isNotEmpty) return suggestions.first;
 
-    // Fallback to Nominatim if Photon returns nothing or is blocked.
     return _geocodeWithNominatim(cityName.trim());
   }
 
@@ -68,11 +67,15 @@ class WeatherService {
       );
 
       final results = response.data as List<dynamic>? ?? [];
-      if (results.isEmpty) return null;
+      if (results.isEmpty) {
+        return null;
+      }
 
       final data = results.first as Map<String, dynamic>;
       final name = data['name']?.toString() ?? '';
-      if (name.isEmpty) return null;
+      if (name.isEmpty) {
+        return null;
+      }
 
       final address = data['address'] as Map<String, dynamic>? ?? {};
       String country = address['country']?.toString() ?? '';
@@ -85,7 +88,9 @@ class WeatherService {
 
       final latitude = double.tryParse(data['lat']?.toString() ?? '') ?? 0.0;
       final longitude = double.tryParse(data['lon']?.toString() ?? '') ?? 0.0;
-      if (latitude == 0.0 && longitude == 0.0) return null;
+      if (latitude == 0.0 && longitude == 0.0) {
+        return null;
+      }
 
       return Location(
         name: name,

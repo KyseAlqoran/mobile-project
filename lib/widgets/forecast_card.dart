@@ -26,7 +26,9 @@ class ForecastCard extends StatelessWidget {
   }
 
   String _getDayName(DateTime date) {
-    if (isToday) return 'Today';
+    if (isToday) {
+      return 'Today';
+    }
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return days[date.weekday - 1];
   }
@@ -37,12 +39,10 @@ class ForecastCard extends StatelessWidget {
     final icon = WeatherUtils.getWeatherIcon(forecast.weatherCode);
 
     final totalRange = weeklyMax - weeklyMin;
-    final double startFraction = totalRange > 0
-        ? (forecast.minTemp - weeklyMin) / totalRange
-        : 0.0;
-    final double endFraction = totalRange > 0
-        ? (forecast.maxTemp - weeklyMin) / totalRange
-        : 1.0;
+    final double startFraction =
+        totalRange > 0 ? (forecast.minTemp - weeklyMin) / totalRange : 0.0;
+    final double endFraction =
+        totalRange > 0 ? (forecast.maxTemp - weeklyMin) / totalRange : 1.0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),

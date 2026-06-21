@@ -6,13 +6,11 @@ import '../widgets/weather_view.dart';
 
 class CurrentLocationScreen extends StatefulWidget {
   final bool isCelsius;
-  final bool isMetric;
   final void Function(WeatherData) onWeatherLoaded;
 
   const CurrentLocationScreen({
     super.key,
     required this.isCelsius,
-    required this.isMetric,
     required this.onWeatherLoaded,
   });
 
@@ -140,7 +138,6 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
       currentLocation: _currentLocation!,
       weatherData: _weatherData!,
       isCelsius: widget.isCelsius,
-      isMetric: widget.isMetric,
       onRefresh: _fetchLocationAndWeather,
     );
   }

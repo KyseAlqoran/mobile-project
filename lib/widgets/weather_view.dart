@@ -8,7 +8,6 @@ class WeatherView extends StatelessWidget {
   final Location currentLocation;
   final WeatherData weatherData;
   final bool isCelsius;
-  final bool isMetric;
   final Future<void> Function() onRefresh;
 
   const WeatherView({
@@ -16,7 +15,6 @@ class WeatherView extends StatelessWidget {
     required this.currentLocation,
     required this.weatherData,
     required this.isCelsius,
-    this.isMetric = true,
     required this.onRefresh,
   });
 
@@ -58,8 +56,12 @@ class WeatherView extends StatelessWidget {
     double weeklyMin = 100;
     double weeklyMax = -100;
     for (final d in weatherData.daily) {
-      if (d.minTemp < weeklyMin) weeklyMin = d.minTemp;
-      if (d.maxTemp > weeklyMax) weeklyMax = d.maxTemp;
+      if (d.minTemp < weeklyMin) {
+        weeklyMin = d.minTemp;
+      }
+      if (d.maxTemp > weeklyMax) {
+        weeklyMax = d.maxTemp;
+      }
     }
 
     return RefreshIndicator(
@@ -71,7 +73,6 @@ class WeatherView extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-
             SizedBox(
               width: double.infinity,
               child: FittedBox(
@@ -112,15 +113,10 @@ class WeatherView extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
-
             const SizedBox(height: 30),
-
             if (upcomingHourly.isNotEmpty) _buildHourlyCard(upcomingHourly),
-
             _buildDailyCard(weeklyMin, weeklyMax),
-
             _buildDetailGrid(current, daily),
-
             const SizedBox(height: 40),
           ],
         ),
@@ -212,9 +208,7 @@ class WeatherView extends StatelessWidget {
         _tile(
           Icons.air,
           'WIND',
-          isMetric
-              ? '${current.windSpeed.round()} km/h'
-              : '${(current.windSpeed * 0.621371).round()} mph',
+          '${current.windSpeed.round()} km/h',
         ),
         _tile(
           Icons.water_drop,
@@ -230,9 +224,7 @@ class WeatherView extends StatelessWidget {
         _tile(
           Icons.visibility,
           'VISIBILITY',
-          isMetric
-              ? '${(current.visibility / 1000).toStringAsFixed(0)} km'
-              : '${(current.visibility / 1609.344).toStringAsFixed(0)} mi',
+          '${(current.visibility / 1000).toStringAsFixed(0)} km',
         ),
         _tile(
           Icons.speed,

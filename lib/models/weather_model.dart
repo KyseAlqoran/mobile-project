@@ -87,7 +87,6 @@ class DailyForecast {
   final double precipitation;
   final String sunrise;
   final String sunset;
-  final double uvIndexMax;
 
   DailyForecast({
     required this.date,
@@ -97,7 +96,6 @@ class DailyForecast {
     required this.precipitation,
     required this.sunrise,
     required this.sunset,
-    required this.uvIndexMax,
   });
 }
 
@@ -123,7 +121,6 @@ class WeatherData {
     final List<dynamic> precipitations = dailyJson['precipitation_sum'] ?? [];
     final List<dynamic> sunrises = dailyJson['sunrise'] ?? [];
     final List<dynamic> sunsets = dailyJson['sunset'] ?? [];
-    final List<dynamic> uvIndexes = dailyJson['uv_index_max'] ?? [];
 
     List<DailyForecast> daily = [];
     for (int i = 0; i < dailyTimes.length; i++) {
@@ -138,7 +135,6 @@ class WeatherData {
                   .toDouble(),
           sunrise: sunrises.length > i ? sunrises[i]?.toString() ?? '' : '',
           sunset: sunsets.length > i ? sunsets[i]?.toString() ?? '' : '',
-          uvIndexMax: (uvIndexes.length > i ? uvIndexes[i] ?? 0 : 0).toDouble(),
         ),
       );
     }
@@ -153,8 +149,8 @@ class WeatherData {
       hourly.add(
         HourlyForecast(
           date: DateTime.tryParse(hourlyTimes[i].toString()) ?? DateTime.now(),
-          temperature: (hourlyTemps.length > i ? hourlyTemps[i] ?? 0 : 0)
-              .toDouble(),
+          temperature:
+              (hourlyTemps.length > i ? hourlyTemps[i] ?? 0 : 0).toDouble(),
           weatherCode: hourlyCodes.length > i ? hourlyCodes[i] ?? 0 : 0,
         ),
       );
@@ -166,18 +162,42 @@ class WeatherData {
 
 class WeatherUtils {
   static String getWeatherLabel(int code) {
-    if (code == 0) return 'Clear';
-    if (code == 1) return 'Mainly Clear';
-    if (code == 2) return 'Partly Cloudy';
-    if (code == 3) return 'Overcast';
-    if (code >= 45 && code <= 48) return 'Foggy';
-    if (code >= 51 && code <= 55) return 'Drizzle';
-    if (code >= 61 && code <= 65) return 'Rain';
-    if (code >= 71 && code <= 75) return 'Snow';
-    if (code >= 80 && code <= 82) return 'Rain Showers';
-    if (code >= 85 && code <= 86) return 'Snow Showers';
-    if (code == 95) return 'Thunderstorm';
-    if (code == 99) return 'Heavy Thunderstorm';
+    if (code == 0) {
+      return 'Clear';
+    }
+    if (code == 1) {
+      return 'Mainly Clear';
+    }
+    if (code == 2) {
+      return 'Partly Cloudy';
+    }
+    if (code == 3) {
+      return 'Overcast';
+    }
+    if (code >= 45 && code <= 48) {
+      return 'Foggy';
+    }
+    if (code >= 51 && code <= 55) {
+      return 'Drizzle';
+    }
+    if (code >= 61 && code <= 65) {
+      return 'Rain';
+    }
+    if (code >= 71 && code <= 75) {
+      return 'Snow';
+    }
+    if (code >= 80 && code <= 82) {
+      return 'Rain Showers';
+    }
+    if (code >= 85 && code <= 86) {
+      return 'Snow Showers';
+    }
+    if (code == 95) {
+      return 'Thunderstorm';
+    }
+    if (code == 99) {
+      return 'Heavy Thunderstorm';
+    }
     return 'Unknown';
   }
 
@@ -190,14 +210,30 @@ class WeatherUtils {
           ? 'assets/weather/partly_cloudy.svg'
           : 'assets/weather/night.svg';
     }
-    if (code == 3) return 'assets/weather/cloud.svg';
-    if (code >= 45 && code <= 48) return 'assets/weather/cloud.svg';
-    if (code >= 51 && code <= 55) return 'assets/weather/drizzle.svg';
-    if (code >= 61 && code <= 65) return 'assets/weather/rain.svg';
-    if (code >= 71 && code <= 75) return 'assets/weather/snow.svg';
-    if (code >= 80 && code <= 82) return 'assets/weather/rain.svg';
-    if (code >= 85 && code <= 86) return 'assets/weather/snow.svg';
-    if (code == 95 || code == 99) return 'assets/weather/storm.svg';
+    if (code == 3) {
+      return 'assets/weather/cloud.svg';
+    }
+    if (code >= 45 && code <= 48) {
+      return 'assets/weather/cloud.svg';
+    }
+    if (code >= 51 && code <= 55) {
+      return 'assets/weather/drizzle.svg';
+    }
+    if (code >= 61 && code <= 65) {
+      return 'assets/weather/rain.svg';
+    }
+    if (code >= 71 && code <= 75) {
+      return 'assets/weather/snow.svg';
+    }
+    if (code >= 80 && code <= 82) {
+      return 'assets/weather/rain.svg';
+    }
+    if (code >= 85 && code <= 86) {
+      return 'assets/weather/snow.svg';
+    }
+    if (code == 95 || code == 99) {
+      return 'assets/weather/storm.svg';
+    }
     return 'assets/weather/cloud.svg';
   }
 
@@ -227,12 +263,24 @@ class WeatherUtils {
   }
 
   static Color getTempColor(double tempC) {
-    if (tempC <= 5) return const Color(0xFF22D3EE);
-    if (tempC <= 12) return const Color(0xFF4ADE80);
-    if (tempC <= 18) return const Color(0xFFA3E635);
-    if (tempC <= 23) return const Color(0xFFFBBF24);
-    if (tempC <= 28) return const Color(0xFFF59E0B);
-    if (tempC <= 33) return const Color(0xFFF97316);
+    if (tempC <= 5) {
+      return const Color(0xFF22D3EE);
+    }
+    if (tempC <= 12) {
+      return const Color(0xFF4ADE80);
+    }
+    if (tempC <= 18) {
+      return const Color(0xFFA3E635);
+    }
+    if (tempC <= 23) {
+      return const Color(0xFFFBBF24);
+    }
+    if (tempC <= 28) {
+      return const Color(0xFFF59E0B);
+    }
+    if (tempC <= 33) {
+      return const Color(0xFFF97316);
+    }
     return const Color(0xFFEF4444);
   }
 }

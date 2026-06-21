@@ -14,7 +14,6 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
   bool _isCelsius = true;
-  bool _isMetric = true;
   WeatherData? _myLocationWeatherData;
   WeatherData? _searchWeatherData;
 
@@ -46,12 +45,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final pages = [
       CurrentLocationScreen(
         isCelsius: _isCelsius,
-        isMetric: _isMetric,
         onWeatherLoaded: _onMyLocationWeatherLoaded,
       ),
       SearchScreen(
         isCelsius: _isCelsius,
-        isMetric: _isMetric,
         onWeatherLoaded: _onSearchWeatherLoaded,
       ),
     ];
@@ -69,40 +66,20 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 children: [
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _isCelsius = !_isCelsius;
-                            });
-                          },
-                          child: Text(
-                            _isCelsius ? '°C' : '°F',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isCelsius = !_isCelsius;
+                        });
+                      },
+                      child: Text(
+                        _isCelsius ? '°C' : '°F',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _isMetric = !_isMetric;
-                            });
-                          },
-                          child: Text(
-                            _isMetric ? 'km' : 'mi',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                   Expanded(
